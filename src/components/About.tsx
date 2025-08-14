@@ -1,211 +1,141 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { User, Award, Target, Lightbulb, MapPin, GraduationCap } from 'lucide-react';
+import { motion, Variants } from 'framer-motion';
+import { Download, CheckCircle2, Factory, Cog, TestTube2, Cpu, Scale } from 'lucide-react';
+
+// Animation variants for staggering children
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.6,
+      ease: 'easeOut',
+    },
+  },
+};
+
+// Skill Item Component for reusability
+const SkillItem = ({ icon: Icon, text }: { icon: React.ElementType; text: string }) => (
+  <motion.div variants={itemVariants} className="flex items-center gap-3">
+    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+      <Icon size={18} />
+    </div>
+    <span className="text-slate-300">{text}</span>
+  </motion.div>
+);
 
 const About: React.FC = () => {
-  const highlights = [
-    {
-      icon: User,
-      title: "Professional Engineer",
-      description: "Motivated Manufacturing, Industrial and Textile Engineer with expertise in sustainable manufacturing and process optimization."
-    },
-    {
-      icon: GraduationCap,
-      title: "Educational Excellence",
-      description: "Bachelor of Engineering from Moi University with specialized focus on Manufacturing, Industrial and Textile Engineering."
-    },
-    {
-      icon: Target,
-      title: "Technical Expertise",
-      description: "Proficient in CAD design (AutoCAD, SolidWorks), lean manufacturing, quality control, and production planning."
-    },
-    {
-      icon: Lightbulb,
-      title: "Innovation Focus",
-      description: "Passionate about sustainable solutions, process optimization, and contributing to high-performance manufacturing environments."
-    }
-  ];
-
-  const personalInfo = [
-    { label: "Location", value: "Kitui, Eastern Kenya", icon: MapPin },
-    { label: "Education", value: "Moi University - B.Eng", icon: GraduationCap },
-    { label: "Specialization", value: "Manufacturing & Industrial Engineering", icon: Award },
-    { label: "Experience", value: "Multiple Industrial Attachments", icon: Target }
+  const skills = [
+    { icon: Factory, text: 'Manufacturing Process Optimization' },
+    { icon: Scale, text: 'Lean Manufacturing & Six Sigma Basics' },
+    { icon: Cpu, text: 'CAD Design (AutoCAD, SolidWorks)' },
+    { icon: Cog, text: 'Production Planning & Quality Control' },
+    { icon: TestTube2, text: 'Sustainable Materials & Engineering' },
+    { icon: CheckCircle2, text: 'Industrial Safety & Compliance' },
   ];
 
   return (
-    <section id="about" className="py-20 bg-gradient-to-b from-slate-800/50 to-navy-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
+    <section id="about" className="overflow-hidden bg-[#12181F] py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <motion.div 
+          className="mx-auto max-w-2xl text-center"
+          initial={{ opacity: 0, y: -50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            About <span className="text-amber-400">Me</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-emerald-400 mx-auto mb-6"></div>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Engineering excellence through innovation, sustainability, and continuous improvement 
-            in modern manufacturing environments.
+          <h2 className="text-base font-semibold leading-7 text-emerald-400">About Me</h2>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            A Passion for Engineering Excellence
           </p>
+          <div className="mx-auto mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-amber-400 to-emerald-400" />
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Professional Photo Section */}
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-16 gap-y-16 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 items-center">
+          {/* Left Column: Image Card */}
           <motion.div
+            className="relative flex justify-center"
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="relative"
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            <div className="relative mx-auto w-80 h-80 md:w-96 md:h-96">
-              {/* Background Design Elements */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-emerald-400/20 rounded-3xl transform rotate-6 blur-xl"></div>
-              <div className="absolute inset-2 bg-gradient-to-r from-amber-400 to-emerald-400 rounded-2xl transform rotate-3"></div>
-              
-              {/* Main Photo Container */}
-              <div className="relative bg-slate-700 rounded-2xl overflow-hidden border-4 border-slate-600 shadow-2xl">
-                <img
-                  src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600"
-                  alt="James Ngene - Professional Manufacturing Engineer"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+            {/* The inline style is used here for a dynamic gradient that can't be easily replicated with standard Tailwind classes. */}
+            <div className="relative w-full max-w-sm rounded-lg p-2" style={{ background: 'linear-gradient(145deg, #1f2937, #111827)' }}>
+                {/* Metallic Shine Effect */}
+                <div className="absolute inset-0 z-10 rounded-lg border border-white/10" />
+                <div className="absolute -inset-px z-0 rounded-lg bg-gradient-to-br from-emerald-500 via-transparent to-amber-500 opacity-20 blur-lg" />
                 
-                {/* Professional Badge */}
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg p-3 border border-amber-400/30">
-                    <div className="text-amber-400 font-semibold text-sm">James Ngene</div>
-                    <div className="text-gray-300 text-xs">Manufacturing Engineer</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Elements */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -top-4 -right-4 bg-emerald-400 text-slate-900 p-3 rounded-full shadow-lg"
-              >
-                <Award className="w-6 h-6" />
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
-                className="absolute -bottom-4 -left-4 bg-amber-400 text-slate-900 p-3 rounded-full shadow-lg"
-              >
-                <Lightbulb className="w-6 h-6" />
-              </motion.div>
+                {/* Replace with actual image */}
+                <img
+                    src="https://via.placeholder.com/600x700/1f2937/ffffff?text=James+Ngene" // <-- IMPORTANT: Replace this placeholder
+                    alt="Professional portrait of James Ngene"
+                    className="relative z-10 h-auto w-full rounded-md object-cover"
+                />
             </div>
           </motion.div>
 
-          {/* About Content */}
-          <motion.div
+          {/* Right Column: Narrative & Skills */}
+          <motion.div 
+            className="space-y-12"
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="space-y-8"
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            {/* Professional Summary */}
-            <div className="space-y-6">
-              <h3 className="text-3xl font-bold text-white">
-                Professional <span className="text-emerald-400">Engineer</span>
+            {/* Narrative Section */}
+            <div>
+              <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                From Concept to Creation
               </h3>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                I am a motivated and detail-oriented Manufacturing, Industrial and Textile Engineer 
-                with a strong foundation in industrial processes, sustainable manufacturing, and 
-                production optimization. Through academic excellence at Moi University and practical 
-                experience gained through multiple internships and professional roles, I have 
-                developed comprehensive skills in process control, lean manufacturing, and quality assurance.
+              <p className="mt-6 text-lg leading-8 text-slate-300">
+                I am a motivated and detail-oriented Manufacturing, Industrial, and Textile Engineer, recently graduated from Moi University. My academic journey and hands-on internships have equipped me with a strong foundation in industrial processes, sustainable manufacturing, and production optimization.
               </p>
-              
-              <p className="text-gray-300 text-lg leading-relaxed">
-                My passion lies in driving efficiency, solving complex engineering challenges, and 
-                contributing to high-performance manufacturing environments. With expertise in 
-                technical tools like AutoCAD and SolidWorks, combined with hands-on experience 
-                in maintenance operations and production support, I am well-positioned to support 
-                advanced manufacturing goals and sustainable engineering solutions.
+              <p className="mt-4 text-lg leading-8 text-slate-300">
+                Through practical experience at the{' '}
+                <strong className="font-semibold text-amber-300">Kenya Industrial Research and Development Institute (KIRDI)</strong> and{' '}
+                <strong className="font-semibold text-amber-300">Buffalo Millers</strong>, I have honed my skills in process control, lean manufacturing, and quality assurance. My passion lies in driving efficiency, solving complex engineering challenges, and contributing to high-performance manufacturing environments.
               </p>
-            </div>
-
-            {/* Personal Information Cards */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              {personalInfo.map((info, index) => (
-                <motion.div
-                  key={info.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-slate-700/30 backdrop-blur-sm p-4 rounded-xl border border-slate-600 hover:border-amber-400/50 transition-all"
-                >
-                  <div className="flex items-start space-x-3">
-                    <info.icon className="text-amber-400 w-5 h-5 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="text-white font-semibold text-sm">{info.label}</h4>
-                      <p className="text-gray-400 text-sm mt-1">{info.value}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Key Highlights */}
-            <div className="space-y-4">
-              <h4 className="text-emerald-400 font-semibold text-xl">Key Highlights</h4>
-              <div className="grid gap-4">
-                {highlights.map((highlight, index) => (
-                  <motion.div
-                    key={highlight.title}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    whileHover={{ x: 5 }}
-                    className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-600 hover:border-emerald-400/50 transition-all"
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-gradient-to-r from-amber-400 to-emerald-400 p-2 rounded-lg">
-                        <highlight.icon className="text-slate-900 w-5 h-5" />
-                      </div>
-                      <div>
-                        <h5 className="text-white font-semibold mb-2">{highlight.title}</h5>
-                        <p className="text-gray-400 text-sm leading-relaxed">{highlight.description}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Call to Action */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-xl p-6 border border-slate-600"
-            >
-              <h4 className="text-amber-400 font-semibold mb-3">Ready to Collaborate</h4>
-              <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                I'm actively seeking opportunities to apply my engineering expertise in challenging 
-                manufacturing environments where innovation, sustainability, and process excellence 
-                are valued.
-              </p>
-              <motion.button
+              <motion.a
+                href="/path-to-your-cv.pdf" // <-- IMPORTANT: Update this path
+                download
+                className="mt-10 inline-flex items-center justify-center gap-2 rounded-md bg-emerald-500 px-8 py-3 font-semibold text-black transition-transform duration-300 hover:bg-emerald-400"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-gradient-to-r from-amber-400 to-emerald-400 text-slate-900 px-6 py-2 rounded-lg font-semibold text-sm hover:from-amber-300 hover:to-emerald-300 transition-all"
               >
-                Let's Connect
-              </motion.button>
+                <Download size={20} />
+                Download My CV
+              </motion.a>
+            </div>
+
+            {/* Skills Section */}
+            <motion.div
+              className="w-full"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.5 }}
+            >
+              <div className="rounded-2xl bg-slate-500/5 p-8 ring-1 ring-white/10 backdrop-blur-sm">
+                <h3 className="text-xl font-bold tracking-tight text-white mb-6">Core Competencies</h3>
+                <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
+                  {skills.map((skill) => (
+                    <SkillItem key={skill.text} icon={skill.icon} text={skill.text} />
+                  ))}
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         </div>
