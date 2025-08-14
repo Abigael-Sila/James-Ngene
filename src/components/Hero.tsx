@@ -11,21 +11,6 @@ declare global {
   }
 }
 
-// Load Three.js from a CDN for this self-contained React app
-const loadThreeJS = () => {
-  const script = document.createElement('script');
-  script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-  script.onload = () => {
-    console.log('Three.js loaded successfully!');
-  };
-  document.head.appendChild(script);
-};
-
-// Check if three.js is loaded, and if not, load it.
-if (typeof window !== 'undefined' && typeof window.THREE === 'undefined') {
-  loadThreeJS();
-}
-
 // Animation variants for cleaner reuse with explicit typing
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -53,107 +38,124 @@ const itemVariants: Variants = {
 // Component for the 3D animated background
 const ThreeJSBackground = () => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number>();
 
   useEffect(() => {
-    // Ensure Three.js and the ref are available before proceeding
-    if (!window.THREE || !mountRef.current) {
-      // Return early if not ready. The effect will re-run when the state changes.
-      return;
+    // If Three.js is not loaded, dynamically add the script
+    if (typeof window.THREE === 'undefined') {
+      const script = document.createElement('script');
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      script.onload = () => {
+        // Once the script is loaded, trigger a re-render to start the animation
+        setupAnimation();
+      };
+      document.head.appendChild(script);
+    } else {
+      // If Three.js is already loaded, just set up the animation
+      setupAnimation();
     }
 
-    // Basic Three.js setup
-    const scene = new window.THREE.Scene();
-    const camera = new window.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new window.THREE.WebGLRenderer({ alpha: true, antialias: true });
+    // Function to set up the animation
+    const setupAnimation = () => {
+      if (!mountRef.current) return;
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    mountRef.current.appendChild(renderer.domElement);
-    
-    // Position the camera
-    camera.position.z = 10;
-    
-    // Add ambient light for overall illumination
-    const ambientLight = new window.THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-    
-    // Add a directional light for highlights and shadows
-    const directionalLight = new window.THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 5, 5);
-    scene.add(directionalLight);
+      // Basic Three.js setup
+      const scene = new window.THREE.Scene();
+      const camera = new window.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new window.THREE.WebGLRenderer({ alpha: true, antialias: true });
 
-    // Create a group to hold all the animated objects
-    const objects = new window.THREE.Group();
-    scene.add(objects);
-
-    // Define object geometries and materials
-    const boltGeometry = new window.THREE.CylinderGeometry(0.5, 0.5, 2, 6);
-    const nutGeometry = new window.THREE.CylinderGeometry(0.8, 0.8, 0.5, 6);
-    const gearGeometry = new window.THREE.CylinderGeometry(1.5, 1.5, 0.3, 10, 1, false);
-    
-    const material = new window.THREE.MeshStandardMaterial({
-      color: 0x808080, // A metallic grey
-      metalness: 0.8,
-      roughness: 0.2,
-    });
-
-    // Function to create a random object
-    const createObject = () => {
-      const geometries = [boltGeometry, nutGeometry, gearGeometry];
-      const geometry = geometries[Math.floor(Math.random() * geometries.length)];
-      const object = new window.THREE.Mesh(geometry, material);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      mountRef.current.appendChild(renderer.domElement);
       
-      object.position.x = (Math.random() - 0.5) * 50;
-      object.position.y = (Math.random() - 0.5) * 50;
-      object.position.z = (Math.random() - 0.5) * 50;
+      // Position the camera
+      camera.position.z = 10;
       
-      object.rotation.x = Math.random() * Math.PI;
-      object.rotation.y = Math.random() * Math.PI;
+      // Add ambient light for overall illumination
+      const ambientLight = new window.THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
       
-      objects.add(object);
-    };
+      // Add a directional light for highlights and shadows
+      const directionalLight = new window.THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(5, 5, 5);
+      scene.add(directionalLight);
 
-    // Create a number of objects
-    for (let i = 0; i < 50; i++) {
-      createObject();
-    }
+      // Create a group to hold all the animated objects
+      const objects = new window.THREE.Group();
+      scene.add(objects);
 
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      // Rotate each object in the group
-      objects.children.forEach((object: any) => {
-        object.rotation.x += 0.005;
-        object.rotation.y += 0.005;
+      // Define object geometries and materials
+      const boltGeometry = new window.THREE.CylinderGeometry(0.5, 0.5, 2, 6);
+      const nutGeometry = new window.THREE.CylinderGeometry(0.8, 0.8, 0.5, 6);
+      const gearGeometry = new window.THREE.CylinderGeometry(1.5, 1.5, 0.3, 10, 1, false);
+      
+      const material = new window.THREE.MeshStandardMaterial({
+        color: 0xeeeeee, // A brighter metallic color
+        metalness: 0.9,
+        roughness: 0.3,
       });
 
-      // Slowly move objects
-      objects.position.x += 0.01;
-      objects.position.y += 0.01;
+      // Function to create a random object
+      const createObject = () => {
+        const geometries = [boltGeometry, nutGeometry, gearGeometry];
+        const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+        const object = new window.THREE.Mesh(geometry, material);
+        
+        object.position.x = (Math.random() - 0.5) * 50;
+        object.position.y = (Math.random() - 0.5) * 50;
+        object.position.z = (Math.random() - 0.5) * 50;
+        
+        object.rotation.x = Math.random() * Math.PI;
+        object.rotation.y = Math.random() * Math.PI;
+        
+        objects.add(object);
+      };
 
-      renderer.render(scene, camera);
-    };
-
-    // Handle window resizing
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-    animate();
-
-    return () => {
-      // Clean up on component unmount
-      if (mountRef.current) {
-        mountRef.current.removeChild(renderer.domElement);
+      // Create a number of objects
+      for (let i = 0; i < 100; i++) {
+        createObject();
       }
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
-  return <div ref={mountRef} className="absolute inset-0 z-0 opacity-10" />;
+      // Animation loop
+      const animate = () => {
+        animationRef.current = requestAnimationFrame(animate);
+
+        // Rotate each object in the group
+        objects.children.forEach((object: any) => {
+          object.rotation.x += 0.01;
+          object.rotation.y += 0.01;
+        });
+
+        // Slowly move objects
+        objects.position.x += 0.02;
+        objects.position.y += 0.02;
+
+        renderer.render(scene, camera);
+      };
+
+      // Handle window resizing
+      const handleResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      };
+
+      window.addEventListener('resize', handleResize);
+      animate();
+
+      return () => {
+        // Clean up on component unmount
+        if (mountRef.current) {
+          mountRef.current.removeChild(renderer.domElement);
+        }
+        window.removeEventListener('resize', handleResize);
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
+    };
+  }, []); // Empty dependency array ensures this effect runs only once on mount
+
+  return <div ref={mountRef} className="absolute inset-0 z-0 opacity-20" />;
 };
 
 const Hero: React.FC = () => {
