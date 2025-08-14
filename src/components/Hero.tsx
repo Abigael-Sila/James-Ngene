@@ -41,20 +41,6 @@ const ThreeJSBackground = () => {
   const animationRef = useRef<number>();
 
   useEffect(() => {
-    // If Three.js is not loaded, dynamically add the script
-    if (typeof window.THREE === 'undefined') {
-      const script = document.createElement('script');
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-      script.onload = () => {
-        // Once the script is loaded, trigger a re-render to start the animation
-        setupAnimation();
-      };
-      document.head.appendChild(script);
-    } else {
-      // If Three.js is already loaded, just set up the animation
-      setupAnimation();
-    }
-
     // Function to set up the animation
     const setupAnimation = () => {
       if (!mountRef.current) return;
@@ -153,6 +139,20 @@ const ThreeJSBackground = () => {
         }
       };
     };
+
+    // If Three.js is not loaded, dynamically add the script
+    if (typeof window.THREE === 'undefined') {
+      const script = document.createElement('script');
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      script.onload = () => {
+        // Once the script is loaded, trigger a re-render to start the animation
+        setupAnimation();
+      };
+      document.head.appendChild(script);
+    } else {
+      // If Three.js is already loaded, just set up the animation
+      setupAnimation();
+    }
   }, []); // Empty dependency array ensures this effect runs only once on mount
 
   return <div ref={mountRef} className="absolute inset-0 z-0 opacity-20" />;
