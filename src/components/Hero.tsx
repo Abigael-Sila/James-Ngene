@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { ArrowRight, Linkedin } from 'lucide-react';
-// The path to the image must be enclosed in quotes to be a valid string
+// Import the image from the assets folder
 import JamesNgene from '../assets/Ngene.png';
+import * as THREE from 'three';
 
 // Animation variants for cleaner reuse with explicit typing
 const containerVariants: Variants = {
@@ -28,13 +29,111 @@ const itemVariants: Variants = {
   },
 };
 
+// Component for the 3D animated background
+const ThreeJSBackground = () => {
+  const mountRef = useRef(null);
+
+  useEffect(() => {
+    // Basic Three.js setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    mountRef.current.appendChild(renderer.domElement);
+    
+    // Position the camera
+    camera.position.z = 10;
+    
+    // Add ambient light for overall illumination
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    
+    // Add a directional light for highlights and shadows
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 5, 5);
+    scene.add(directionalLight);
+
+    // Create a group to hold all the animated objects
+    const objects = new THREE.Group();
+    scene.add(objects);
+
+    // Define object geometries and materials
+    const boltGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 6);
+    const nutGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.5, 6);
+    const gearGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.3, 10, 1, false);
+    
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x808080, // A metallic grey
+      metalness: 0.8,
+      roughness: 0.2,
+    });
+
+    // Function to create a random object
+    const createObject = () => {
+      const geometries = [boltGeometry, nutGeometry, gearGeometry];
+      const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+      const object = new THREE.Mesh(geometry, material);
+      
+      object.position.x = (Math.random() - 0.5) * 50;
+      object.position.y = (Math.random() - 0.5) * 50;
+      object.position.z = (Math.random() - 0.5) * 50;
+      
+      object.rotation.x = Math.random() * Math.PI;
+      object.rotation.y = Math.random() * Math.PI;
+      
+      objects.add(object);
+    };
+
+    // Create a number of objects
+    for (let i = 0; i < 50; i++) {
+      createObject();
+    }
+
+    // Animation loop
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      // Rotate each object in the group
+      objects.children.forEach(object => {
+        object.rotation.x += 0.005;
+        object.rotation.y += 0.005;
+      });
+
+      // Slowly move objects
+      objects.position.x += 0.01;
+      objects.position.y += 0.01;
+
+      renderer.render(scene, camera);
+    };
+
+    // Handle window resizing
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+    animate();
+
+    return () => {
+      // Clean up on component unmount
+      mountRef.current.removeChild(renderer.domElement);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return <div ref={mountRef} className="absolute inset-0 z-0 opacity-10" />;
+};
+
 const Hero: React.FC = () => {
   return (
     <section id="home" className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#12181F] font-inter text-white">
-      {/* Subtle Background Accent */}
-      <div className="absolute -left-48 -top-48 h-[40rem] w-[40rem] rounded-full bg-emerald-500/5 blur-3xl" />
-      <div className="absolute -bottom-72 -right-72 h-[40rem] w-[40rem] rounded-full bg-amber-500/5 blur-3xl" />
+      {/* Three.js animated background */}
+      <ThreeJSBackground />
 
+      {/* Main content container with a higher z-index to sit on top of the background */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           className="grid items-center gap-12 lg:grid-cols-2"
@@ -81,9 +180,9 @@ const Hero: React.FC = () => {
             </motion.div>
           </div>
 
-          {/* Right Side: Image */}
+          {/* Right Side: Image - Hidden on small screens, shown on large screens */}
           <motion.div
-            className="relative mx-auto w-full max-w-sm lg:max-w-none"
+            className="hidden lg:block relative mx-auto w-full max-w-sm lg:max-w-none"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
@@ -94,7 +193,7 @@ const Hero: React.FC = () => {
               <div className="absolute inset-0 z-10 rounded-lg border border-white/10" />
               <div className="absolute -inset-px z-0 rounded-lg bg-gradient-to-br from-emerald-500 via-transparent to-amber-500 opacity-30 blur-lg" />
               
-              {/* Replace with actual image */}
+              {/* The image */}
               <img
                 src={JamesNgene} 
                 alt="Professional portrait of James Ngene"
