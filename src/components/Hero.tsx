@@ -3,7 +3,28 @@ import { motion, Variants } from 'framer-motion';
 import { ArrowRight, Linkedin } from 'lucide-react';
 // Import the image from the assets folder
 import JamesNgene from '../assets/Ngene.png';
-import * as THREE from 'three';
+
+// Declare THREE as a global variable to satisfy TypeScript
+declare global {
+  interface Window {
+    THREE: any;
+  }
+}
+
+// Load Three.js from a CDN for this self-contained React app
+const loadThreeJS = () => {
+  const script = document.createElement('script');
+  script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+  script.onload = () => {
+    console.log('Three.js loaded successfully!');
+  };
+  document.head.appendChild(script);
+};
+
+// Check if three.js is loaded, and if not, load it.
+if (typeof window !== 'undefined' && typeof window.THREE === 'undefined') {
+  loadThreeJS();
+}
 
 // Animation variants for cleaner reuse with explicit typing
 const containerVariants: Variants = {
@@ -31,13 +52,19 @@ const itemVariants: Variants = {
 
 // Component for the 3D animated background
 const ThreeJSBackground = () => {
-  const mountRef = useRef(null);
+  const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Ensure Three.js and the ref are available before proceeding
+    if (!window.THREE || !mountRef.current) {
+      // Return early if not ready. The effect will re-run when the state changes.
+      return;
+    }
+
     // Basic Three.js setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const scene = new window.THREE.Scene();
+    const camera = new window.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new window.THREE.WebGLRenderer({ alpha: true, antialias: true });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
@@ -46,24 +73,24 @@ const ThreeJSBackground = () => {
     camera.position.z = 10;
     
     // Add ambient light for overall illumination
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new window.THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
     
     // Add a directional light for highlights and shadows
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    const directionalLight = new window.THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
 
     // Create a group to hold all the animated objects
-    const objects = new THREE.Group();
+    const objects = new window.THREE.Group();
     scene.add(objects);
 
     // Define object geometries and materials
-    const boltGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 6);
-    const nutGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.5, 6);
-    const gearGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.3, 10, 1, false);
+    const boltGeometry = new window.THREE.CylinderGeometry(0.5, 0.5, 2, 6);
+    const nutGeometry = new window.THREE.CylinderGeometry(0.8, 0.8, 0.5, 6);
+    const gearGeometry = new window.THREE.CylinderGeometry(1.5, 1.5, 0.3, 10, 1, false);
     
-    const material = new THREE.MeshStandardMaterial({
+    const material = new window.THREE.MeshStandardMaterial({
       color: 0x808080, // A metallic grey
       metalness: 0.8,
       roughness: 0.2,
@@ -73,7 +100,7 @@ const ThreeJSBackground = () => {
     const createObject = () => {
       const geometries = [boltGeometry, nutGeometry, gearGeometry];
       const geometry = geometries[Math.floor(Math.random() * geometries.length)];
-      const object = new THREE.Mesh(geometry, material);
+      const object = new window.THREE.Mesh(geometry, material);
       
       object.position.x = (Math.random() - 0.5) * 50;
       object.position.y = (Math.random() - 0.5) * 50;
@@ -95,7 +122,7 @@ const ThreeJSBackground = () => {
       requestAnimationFrame(animate);
 
       // Rotate each object in the group
-      objects.children.forEach(object => {
+      objects.children.forEach((object: any) => {
         object.rotation.x += 0.005;
         object.rotation.y += 0.005;
       });
@@ -119,7 +146,9 @@ const ThreeJSBackground = () => {
 
     return () => {
       // Clean up on component unmount
-      mountRef.current.removeChild(renderer.domElement);
+      if (mountRef.current) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
       window.removeEventListener('resize', handleResize);
     };
   }, []);
