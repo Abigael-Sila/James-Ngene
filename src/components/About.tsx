@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import { Download, CheckCircle2, Factory, Cog, TestTube2, Cpu, Scale } from 'lucide-react';
+// Import the image from the assets folder, just like in the Hero component
+import JamesNgene from '../assets/Ngene.png';
 
 // Animation variants for staggering children
 const containerVariants: Variants = {
@@ -47,7 +49,7 @@ const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="overflow-hidden bg-[#12181F] py-24 sm:py-32">
+    <section id="about" className="overflow-hidden bg-[#12181F] font-inter py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div 
           className="mx-auto max-w-2xl text-center"
@@ -74,16 +76,16 @@ const About: React.FC = () => {
           >
             {/* The inline style is used here for a dynamic gradient that can't be easily replicated with standard Tailwind classes. */}
             <div className="relative w-full max-w-sm rounded-lg p-2" style={{ background: 'linear-gradient(145deg, #1f2937, #111827)' }}>
-                {/* Metallic Shine Effect */}
-                <div className="absolute inset-0 z-10 rounded-lg border border-white/10" />
-                <div className="absolute -inset-px z-0 rounded-lg bg-gradient-to-br from-emerald-500 via-transparent to-amber-500 opacity-20 blur-lg" />
-                
-                {/* Replace with actual image */}
-                <img
-                    src="https://via.placeholder.com/600x700/1f2937/ffffff?text=James+Ngene" // <-- IMPORTANT: Replace this placeholder
-                    alt="Professional portrait of James Ngene"
-                    className="relative z-10 h-auto w-full rounded-md object-cover"
-                />
+              {/* Metallic Shine Effect */}
+              <div className="absolute inset-0 z-10 rounded-lg border border-white/10" />
+              <div className="absolute -inset-px z-0 rounded-lg bg-gradient-to-br from-emerald-500 via-transparent to-amber-500 opacity-20 blur-lg" />
+              
+              {/* Replace with actual image */}
+              <img
+                src={JamesNgene} 
+                alt="Professional portrait of James Ngene"
+                className="relative z-10 h-auto w-full rounded-md object-cover"
+              />
             </div>
           </motion.div>
 
