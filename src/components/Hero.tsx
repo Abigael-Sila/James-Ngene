@@ -2,23 +2,21 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Linkedin, ChevronLeft, ChevronRight } from 'lucide-react';
 // Import all the images for the carousel
-import JamesNgene1 from '../assets/Ngene.png'; // Assuming this is the main portrait
+import JamesNgene from '../assets/Ngene.png'; // Assuming this is the main portrait
 // Placeholder names for the newly uploaded files
 // You must adjust the actual import paths for these files in your project:
 import GradImage1 from '../assets/ngene grad 1.jpg';
 import GradImage2 from '../assets/ngene grad 2.jpg';
 import GradImage3 from '../assets/ngene grad 3.jpg';
 import GradImage4 from '../assets/ngene grad 4.jpg';
-import Portrait from '../assets/Ngene.jpg';
 
 // Define the list of images for the carousel
 const images = [
-  { src: JamesNgene1, alt: "Professional portrait" },
   { src: GradImage1, alt: "Graduation photo 1" },
   { src: GradImage2, alt: "Graduation photo 2" },
   { src: GradImage3, alt: "Graduation photo 3" },
   { src: GradImage4, alt: "Graduation photo 4" },
-  { src: Portrait, alt: "Alternative portrait" },
+  { src: JamesNgene, alt: "Alternative portrait" },
 ];
 
 // Declare THREE as a global variable to satisfy TypeScript
