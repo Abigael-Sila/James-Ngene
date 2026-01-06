@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react'; // Added useState and useEffect for CircularCarousel
 import { motion, Variants } from 'framer-motion';
 import { ArrowRight, Linkedin, ChevronLeft, ChevronRight, RotateCw } from 'lucide-react';
+// NEW IMPORTS FOR 3D BACKGROUND
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Box, Sphere, Cylinder, Plane } from '@react-three/drei';
+import * as THREE from 'three';
 
 // ----------------------------------------------------------------------
 // 1. IMPORTS & ASSETS
@@ -14,302 +18,311 @@ import GradImage4 from '../assets/ngene grad 4.jpg';
 
 // Define the list of images
 const images = [
-  { src: JamesNgenePortrait, alt: "Professional Portrait" },
-  { src: GradImage1, alt: "Graduation 1" },
-  { src: GradImage2, alt: "Graduation 2" },
-  { src: GradImage3, alt: "Graduation 3" },
-  { src: GradImage4, alt: "Graduation 4" },
+    { src: JamesNgenePortrait, alt: "Professional Portrait" },
+    { src: GradImage1, alt: "Graduation 1" },
+    { src: GradImage2, alt: "Graduation 2" },
+    { src: GradImage3, alt: "Graduation 3" },
+    { src: GradImage4, alt: "Graduation 4" },
 ];
 
 // ----------------------------------------------------------------------
-// 2. ANIMATION VARIANTS
+// 2. ANIMATION VARIANTS (No Change)
 // ----------------------------------------------------------------------
 const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.2, delayChildren: 0.3 },
-  },
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.2, delayChildren: 0.3 },
+    },
 };
 
 const itemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { duration: 0.6, ease: 'easeOut' },
-  },
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.6, ease: 'easeOut' },
+    },
 };
 
 // ----------------------------------------------------------------------
-// 3. INDUSTRIAL GEAR SVG COMPONENT (With 3D Filters)
+// 3. 3D GEAR COMPONENT (Using Three.js) - UPDATED
 // ----------------------------------------------------------------------
 
-const IndustrialGearSVG = ({ className, size = 100 }: { className?: string, size?: number }) => (
-  // ViewBox is set to 0 0 100 100 for easy scaling
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 100 100" 
-    width={size} 
-    height={size} 
-    className={className}
-    style={{ filter: 'url(#gear-depth)' }} // Apply the 3D filter to the entire gear
-  >
-    <defs>
-      {/* Metallic Gradient (used for the gear body) */}
-      <linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style={{stopColor: 'currentColor', stopOpacity: 0.9}} />
-        <stop offset="50%" style={{stopColor: '#94a3b8', stopOpacity: 0.7}} />
-        <stop offset="100%" style={{stopColor: 'currentColor', stopOpacity: 0.6}} />
-      </linearGradient>
+// A modular 3D gear shape with improved visual realism.
+const Gear3D = ({ position, rotationSpeed, color, size }) => {
+    const meshRef = useRef();
 
-      {/* 3D Depth Filter: Simulates a metallic bevel and drop shadow */}
-      <filter id="gear-depth" x="-50%" y="-50%" width="200%" height="200%">
-        {/* Drop Shadow for the Gear itself */}
-        <feDropShadow dx="3" dy="3" stdDeviation="3" floodColor="#000" floodOpacity="0.5" />
-        {/* Inner Lighting (Bevel/Emboss) */}
-        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur" />
-        <feOffset in="blur" dx="1" dy="1" result="offsetBlur" />
-        <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.8" specularExponent="10" lightingColor="#FFF" result="specular">
-          <fePointLight x="-5000" y="-10000" z="20000" />
-        </feSpecularLighting>
-        <feComposite in="specular" in2="SourceGraphic" operator="in" result="specularComposite" />
-        <feComposite in="SourceGraphic" in2="specularComposite" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="combinedLighting" />
-        <feMerge>
-          <feMergeNode in="offsetBlur" /> 
-          <feMergeNode in="combinedLighting" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-    </defs>
+    useFrame((state, delta) => {
+        // Rotate the mesh every frame
+        meshRef.current.rotation.z += delta * rotationSpeed * 1.5; // Slightly faster for more motion
+    });
 
-    {/* Outer Teeth (Updated shape for realism) */}
-    <path 
-      d="M50 5 L55 0 L50 5 L45 0 Z M50 95 L55 100 L50 95 L45 100 Z M5 50 L0 55 L5 50 L0 45 Z M95 50 L100 55 L95 50 L100 45 Z M22.5 7.5 L27.5 2.5 L22.5 7.5 L17.5 2.5 Z M77.5 7.5 L82.5 2.5 L77.5 7.5 L72.5 2.5 Z M7.5 22.5 L2.5 27.5 L7.5 22.5 L2.5 17.5 Z M92.5 22.5 L97.5 27.5 L92.5 22.5 L87.5 17.5 Z M7.5 77.5 L2.5 82.5 L7.5 77.5 L2.5 72.5 Z M92.5 77.5 L97.5 82.5 L92.5 77.5 L87.5 72.5 Z M22.5 92.5 L27.5 97.5 L22.5 92.5 L17.5 97.5 Z M77.5 92.5 L82.5 97.5 L77.5 92.5 L72.5 97.5 Z" 
-      fill="url(#metalGradient)" 
-      stroke="#333" 
-      strokeWidth="0.5"
-    />
+    // Material setup for a basic metallic look (Slightly darker for better contrast)
+    const metallicMaterial = new THREE.MeshStandardMaterial({
+        color: color,
+        metalness: 0.9,
+        roughness: 0.3, // Make it shinier
+        transparent: true,
+        opacity: 0.3, // Keep it subtle in the background
+    });
 
-    {/* Main Circular Body (Inner Edge Layer 1) */}
-    <circle cx="50" cy="50" r="40" fill="url(#metalGradient)" stroke="#333" strokeWidth="1" />
+    // Material for the darker, recessed parts (The "holes")
+    const recessedMaterial = new THREE.MeshStandardMaterial({ 
+        color: '#0F172A', 
+        metalness: 0.9, 
+        roughness: 0.5 
+    });
 
-    {/* Inner Web (Darker/Recessed Area) */}
-    <circle cx="50" cy="50" r="30" fill="#12181F" stroke="#333" strokeWidth="1" />
+    const numTeeth = 16;
+    const teethRadius = 1.1;
+    const teethAngleStep = (Math.PI * 2) / numTeeth;
 
-    {/* Spokes that connect the hub to the inner rim (Layered over the dark web) */}
-    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(0 50 50)" />
-    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(90 50 50)" />
-    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(180 50 50)" />
-    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(270 50 50)" />
-    
-    {/* Central Hub (Raised Layer) */}
-    <circle cx="50" cy="50" r="10" fill="url(#metalGradient)" stroke="#333" strokeWidth="1" />
-    
-    {/* Bolt Holes on the Outer Body (Recessed Layer) */}
-    <circle cx="50" cy="15" r="2" fill="#12181F" />
-    <circle cx="85" cy="50" r="2" fill="#12181F" />
-    <circle cx="50" cy="85" r="2" fill="#12181F" />
-    <circle cx="15" cy="50" r="2" fill="#12181F" />
-    
-    {/* Final Center Hole */}
-    <circle cx="50" cy="50" r="4" fill="#12181F" />
-  </svg>
-);
-
-
-const MovingGearsBackground = () => {
-  return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-      
-      {/* 1. Large Top Right Gear (Clockwise) */}
-      <motion.div
-        className="absolute -top-32 -right-32 text-slate-700/20"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 40, ease: "linear", repeat: Infinity }}
-      >
-        <IndustrialGearSVG size={700} />
-      </motion.div>
-
-      {/* 2. Smaller Connecting Gear (Top Center) - ROTATES OPPOSITE FOR MESHING */}
-      <motion.div
-        className="absolute top-20 right-1/2 -translate-x-1/2 text-slate-600/20"
-        animate={{ rotate: -360 }} // NEGATIVE ROTATION for meshing effect with Gear 1
-        transition={{ duration: 25, ease: "linear", repeat: Infinity }}
-      >
-        <IndustrialGearSVG size={400} />
-      </motion.div>
-
-      {/* 3. Large Bottom Left Gear (Clockwise) */}
-      <motion.div
-        className="absolute -bottom-48 -left-48 text-slate-700/15"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 50, ease: "linear", repeat: Infinity }}
-      >
-        <IndustrialGearSVG size={800} />
-      </motion.div>
-
-      {/* 4. Medium Floating Gear (Center-ish Right) - Counter-Clockwise */}
-      <motion.div
-        className="absolute bottom-1/4 right-24 text-slate-800/30"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 35, ease: "linear", repeat: Infinity }}
-      >
-        <IndustrialGearSVG size={300} />
-      </motion.div>
-
-    </div>
-  );
+    return (
+        <group ref={meshRef} position={position} scale={[size, size, size]}>
+            
+            {/* Main Body Rim (Cylinder with slightly increased thickness) */}
+            <Cylinder args={[teethRadius, teethRadius, 0.4, 32]} material={metallicMaterial} />
+            
+            {/* Inner Web (Recessed part of the gear) */}
+            <Cylinder args={[0.7, 0.7, 0.4, 32]} position={[0, 0, 0]} material={recessedMaterial} />
+            
+            {/* Teeth (Simple boxes rotated around the perimeter) */}
+            {[...Array(numTeeth)].map((_, i) => (
+                <Box
+                    key={i}
+                    args={[0.2, 0.2, 0.5]} // Extrude the box slightly on the Z-axis for depth
+                    position={[
+                        (teethRadius + 0.1) * Math.cos(i * teethAngleStep),
+                        (teethRadius + 0.1) * Math.sin(i * teethAngleStep),
+                        0,
+                    ]}
+                    rotation={[0, 0, i * teethAngleStep]}
+                    material={metallicMaterial}
+                />
+            ))}
+            
+            {/* Central Hub (Slightly smaller, recessed) */}
+            <Cylinder args={[0.3, 0.3, 0.4, 32]} position={[0, 0, 0]} material={recessedMaterial} />
+            
+        </group>
+    );
 };
 
+
 // ----------------------------------------------------------------------
-// 4. CIRCULAR ORBIT CAROUSEL COMPONENT
+// 4. WEBGL BACKGROUND COMPONENT (Three.js Canvas) - UPDATED POSITIONS
+// ----------------------------------------------------------------------
+
+const WebGLGearBackground = () => {
+    return (
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+            <Canvas camera={{ position: [0, 0, 5], fov: 60 }} className="!w-full !h-full">
+                {/* Ambient Lighting - Soft fill light */}
+                <ambientLight intensity={0.8} />
+                
+                {/* Key Light (Brighter for better metallic sheen) */}
+                <pointLight position={[10, 10, 10]} intensity={100} color={'#F0F9FF'} />
+                
+                {/* Fill Light */}
+                <pointLight position={[-10, -10, -10]} intensity={60} color={'#334155'} />
+
+                {/* Gear 1: Large Top Right (Clockwise) */}
+                <Gear3D 
+                    position={[3, 3, -1]} // Moved slightly further back
+                    rotationSpeed={0.5} 
+                    color={'#64748B'} // Slate 500
+                    size={2.5} 
+                />
+
+                {/* Gear 2: Smaller Top Center (Counter-Clockwise - Meshing Effect) */}
+                {/* Adjusted position to visually align with Gear 1 */}
+                <Gear3D 
+                    position={[0.5, 1.5, -0.5]} 
+                    rotationSpeed={-1.2} 
+                    color={'#334155'} // Slate 700
+                    size={1.5} 
+                />
+
+                {/* Gear 3: Large Bottom Left (Clockwise) */}
+                <Gear3D 
+                    position={[-4, -4, -2]} // Deepest layer
+                    rotationSpeed={0.4} 
+                    color={'#475569'} 
+                    size={3} 
+                />
+                
+                {/* Gear 4: Medium Floating Gear (Center-ish Right) */}
+                <Gear3D 
+                    position={[2, -1, 0]} 
+                    rotationSpeed={-0.8} 
+                    color={'#64748B'} 
+                    size={1.8} 
+                />
+                
+                {/* Simple Background Plane - Darker and further back */}
+                <Plane args={[100, 100]} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -5]}>
+                    <meshStandardMaterial color="#0A1016" metalness={0.5} roughness={0.8} />
+                </Plane>
+
+                {/* Optional: OrbitControls for debugging (Remove in production) */}
+                {/* <OrbitControls /> */}
+            </Canvas>
+        </div>
+    );
+};
+
+
+// ----------------------------------------------------------------------
+// 5. CIRCULAR ORBIT CAROUSEL COMPONENT (No Change)
 // ----------------------------------------------------------------------
 const CircularCarousel = () => {
-  const [rotation, setRotation] = useState(0);
-  
-  // Carousel Configuration
-  const totalImages = images.length;
-  const radius = 160; 
-  const angleStep = 360 / totalImages;
+    const [rotation, setRotation] = useState(0);
+    
+    // Carousel Configuration
+    const totalImages = images.length;
+    const radius = 160; 
+    const angleStep = 360 / totalImages;
 
-  const rotateNext = () => setRotation((prev) => prev - angleStep);
-  const rotatePrev = () => setRotation((prev) => prev + angleStep);
+    const rotateNext = () => setRotation((prev) => prev - angleStep);
+    const rotatePrev = () => setRotation((prev) => prev + angleStep);
 
-  // Auto-rotate effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation((prev) => prev - angleStep);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [angleStep]);
+    // Auto-rotate effect
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setRotation((prev) => prev - angleStep);
+        }, 4000);
+        return () => clearInterval(interval);
+    }, [angleStep]);
 
-  return (
-    <div className="relative flex h-[450px] w-full items-center justify-center overflow-visible">
-      
-      {/* Orbit Ring */}
-      <motion.div 
-        className="absolute rounded-full border-2 border-dashed border-emerald-500/30"
-        style={{ width: radius * 2, height: radius * 2 }}
-        animate={{ rotate: rotation }} 
-        transition={{ duration: 20, ease: "linear", repeat: Infinity }}
-      />
-      
-      {/* Center Element */}
-      <div className="absolute z-0 flex h-24 w-24 items-center justify-center rounded-full bg-slate-800/80 backdrop-blur-sm border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-         <RotateCw className="text-emerald-500/50" size={32} />
-      </div>
+    return (
+        <div className="relative flex h-[450px] w-full items-center justify-center overflow-visible">
+            
+            {/* Orbit Ring */}
+            <motion.div 
+                className="absolute rounded-full border-2 border-dashed border-emerald-500/30"
+                style={{ width: radius * 2, height: radius * 2 }}
+                animate={{ rotate: rotation }} 
+                transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+            />
+            
+            {/* Center Element */}
+            <div className="absolute z-0 flex h-24 w-24 items-center justify-center rounded-full bg-slate-800/80 backdrop-blur-sm border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                <RotateCw className="text-emerald-500/50" size={32} />
+            </div>
 
-      {/* Images Orbiting */}
-      <div className="absolute h-full w-full flex items-center justify-center">
-        {images.map((img, index) => {
-          const currentAngle = index * angleStep + rotation;
-          const rad = (currentAngle * Math.PI) / 180;
-          const x = radius * Math.cos(rad);
-          const y = radius * Math.sin(rad);
+            {/* Images Orbiting */}
+            <div className="absolute h-full w-full flex items-center justify-center">
+                {images.map((img, index) => {
+                    const currentAngle = index * angleStep + rotation;
+                    const rad = (currentAngle * Math.PI) / 180;
+                    const x = radius * Math.cos(rad);
+                    const y = radius * Math.sin(rad);
 
-          return (
-            <motion.div
-              key={index}
-              className="absolute rounded-full border-4 border-slate-800 bg-slate-900 shadow-xl overflow-hidden"
-              style={{
-                width: '100px',
-                height: '100px',
-                x: x, 
-                y: y,
-              }}
-              animate={{ x, y }}
-              transition={{ type: 'spring', stiffness: 50, damping: 15 }}
-            >
-              <img 
-                src={img.src} 
-                alt={img.alt} 
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
-            </motion.div>
-          );
-        })}
-      </div>
+                    return (
+                        <motion.div
+                            key={index}
+                            className="absolute rounded-full border-4 border-slate-800 bg-slate-900 shadow-xl overflow-hidden"
+                            style={{
+                                width: '100px',
+                                height: '100px',
+                                x: x, 
+                                y: y,
+                                // Ensures the orbiting elements stay on top of the 3D canvas
+                                zIndex: 10, 
+                            }}
+                            animate={{ x, y }}
+                            transition={{ type: 'spring', stiffness: 50, damping: 15 }}
+                        >
+                            <img 
+                                src={img.src} 
+                                alt={img.alt} 
+                                className="h-full w-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
+                        </motion.div>
+                    );
+                })}
+            </div>
 
-      {/* Controls */}
-      <div className="absolute bottom-0 flex gap-4">
-         <button onClick={rotatePrev} className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700">
-           <ChevronLeft size={20} />
-         </button>
-         <button onClick={rotateNext} className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700">
-           <ChevronRight size={20} />
-         </button>
-      </div>
-    </div>
-  );
+            {/* Controls */}
+            <div className="absolute bottom-0 flex gap-4">
+                <button onClick={rotatePrev} className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700">
+                    <ChevronLeft size={20} />
+                </button>
+                <button onClick={rotateNext} className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700">
+                    <ChevronRight size={20} />
+                </button>
+            </div>
+        </div>
+    );
 };
 
 // ----------------------------------------------------------------------
-// 5. HERO COMPONENT
+// 6. HERO COMPONENT (Updated Background)
 // ----------------------------------------------------------------------
 const Hero: React.FC = () => {
-  return (
-    <section id="home" className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#12181F] font-inter text-white">
-      
-      {/* NEW BACKGROUND: Moving Gears */}
-      <MovingGearsBackground />
+    return (
+        <section id="home" className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#12181F] font-inter text-white">
+            
+            {/* *** UPDATED BACKGROUND: WebGL (Three.js) Gears *** */}
+            <WebGLGearBackground />
 
-      {/* Main content container */}
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="grid items-center gap-12 lg:grid-cols-2"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Left Side: Text Content */}
-          <div className="text-center lg:text-left">
-            <motion.p variants={itemVariants} className="mb-4 text-lg font-medium text-emerald-400">
-              James Ngene
-            </motion.p>
-            <motion.h1
-              variants={itemVariants}
-              className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl"
-            >
-              Manufacturing, Industrial & <br />
-              <span className="bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent">
-                Textile Engineer
-              </span>
-            </motion.h1>
-            <motion.p variants={itemVariants} className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 lg:mx-0">
-              A recent Moi University graduate dedicated to optimizing manufacturing processes and pioneering sustainable engineering solutions.
-            </motion.p>
-            <motion.div variants={itemVariants} className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
-              <motion.a
-                href="#contact"
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-500 px-8 py-3 font-semibold text-black transition-transform duration-300 hover:bg-emerald-400 sm:w-auto"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Get In Touch <ArrowRight size={20} />
-              </motion.a>
-              <motion.a
-                href="https://www.linkedin.com/in/ngene-james-20625b371/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-slate-600 px-8 py-3 font-semibold text-slate-300 transition-colors duration-300 hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400 sm:w-auto"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Linkedin size={20} /> LinkedIn
-              </motion.a>
-            </motion.div>
-          </div>
+            {/* Main content container */}
+            <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                <motion.div
+                    className="grid items-center gap-12 lg:grid-cols-2"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {/* Left Side: Text Content */}
+                    <div className="text-center lg:text-left">
+                        <motion.p variants={itemVariants} className="mb-4 text-lg font-medium text-emerald-400">
+                            James Ngene
+                        </motion.p>
+                        <motion.h1
+                            variants={itemVariants}
+                            className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl"
+                        >
+                            Manufacturing, Industrial & <br />
+                            <span className="bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent">
+                                Textile Engineer
+                            </span>
+                        </motion.h1>
+                        <motion.p variants={itemVariants} className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 lg:mx-0">
+                            A recent Moi University graduate dedicated to optimizing manufacturing processes and pioneering sustainable engineering solutions.
+                        </motion.p>
+                        <motion.div variants={itemVariants} className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
+                            <motion.a
+                                href="#contact"
+                                className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-500 px-8 py-3 font-semibold text-black transition-transform duration-300 hover:bg-emerald-400 sm:w-auto"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                Get In Touch <ArrowRight size={20} />
+                            </motion.a>
+                            <motion.a
+                                href="https://www.linkedin.com/in/ngene-james-20625b371/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-slate-600 px-8 py-3 font-semibold text-slate-300 transition-colors duration-300 hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400 sm:w-auto"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <Linkedin size={20} /> LinkedIn
+                            </motion.a>
+                        </motion.div>
+                    </div>
 
-          {/* Right Side: Circular Carousel */}
-          <div className="hidden lg:block relative">
-             <CircularCarousel />
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
+                    {/* Right Side: Circular Carousel */}
+                    <div className="hidden lg:block relative">
+                        <CircularCarousel />
+                    </div>
+                </motion.div>
+            </div>
+        </section>
+    );
 };
 
 export default Hero;
