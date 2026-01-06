@@ -5,7 +5,7 @@ import { ArrowRight, Linkedin, ChevronLeft, ChevronRight, RotateCw } from 'lucid
 // ----------------------------------------------------------------------
 // 1. IMPORTS & ASSETS
 // ----------------------------------------------------------------------
-// NOTE: Corrected the portrait import to Ngene.jpg (as uploaded).
+// *** FIXED: Using Ngene.png as requested. ***
 import JamesNgenePortrait from '../assets/Ngene.png'; 
 import GradImage1 from '../assets/ngene grad 1.jpg';
 import GradImage2 from '../assets/ngene grad 2.jpg';
@@ -14,11 +14,11 @@ import GradImage4 from '../assets/ngene grad 4.jpg';
 
 // Define the list of images
 const images = [
-  { src: JamesNgenePortrait, alt: "Professional Portrait" }, // Ngene.jpg
-  { src: GradImage1, alt: "Graduation 1" }, // ngene grad 1.jpg
-  { src: GradImage2, alt: "Graduation 2" }, // ngene grad 2.jpg
-  { src: GradImage3, alt: "Graduation 3" }, // ngene grad 3.jpg
-  { src: GradImage4, alt: "Graduation 4" }, // ngene grad 4.jpg
+  { src: JamesNgenePortrait, alt: "Professional Portrait" },
+  { src: GradImage1, alt: "Graduation 1" },
+  { src: GradImage2, alt: "Graduation 2" },
+  { src: GradImage3, alt: "Graduation 3" },
+  { src: GradImage4, alt: "Graduation 4" },
 ];
 
 // ----------------------------------------------------------------------
@@ -42,10 +42,10 @@ const itemVariants: Variants = {
 };
 
 // ----------------------------------------------------------------------
-// 3. COMPLEX INDUSTRIAL GEAR SVG COMPONENT (New, Realistic Look)
+// 3. INDUSTRIAL GEAR SVG COMPONENT (Updated for Realistic Depth)
 // ----------------------------------------------------------------------
 
-const ComplexGearSVG = ({ className, size = 100 }: { className?: string, size?: number }) => (
+const IndustrialGearSVG = ({ className, size = 100 }: { className?: string, size?: number }) => (
   // ViewBox is set to 0 0 100 100 for easy scaling
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
@@ -53,33 +53,55 @@ const ComplexGearSVG = ({ className, size = 100 }: { className?: string, size?: 
     width={size} 
     height={size} 
     className={className}
-    fill="currentColor"
-    stroke="currentColor"
-    strokeWidth="0.5"
-    strokeLinejoin="round"
   >
-    {/* Outer Gear Teeth (Large Ring) */}
-    <path d="M50 0 L55 5 L50 10 L45 5 Z M50 90 L55 95 L50 100 L45 95 Z M0 50 L5 55 L10 50 L5 45 Z M90 50 L95 55 L100 50 L95 45 Z M20 8.5 L25 13.5 L20 18.5 L15 13.5 Z M80 8.5 L85 13.5 L80 18.5 L75 13.5 Z M8.5 20 L13.5 25 L18.5 20 L13.5 15 Z M8.5 80 L13.5 85 L18.5 80 L13.5 75 Z M91.5 80 L86.5 85 L81.5 80 L86.5 75 Z M91.5 20 L86.5 25 L81.5 20 L86.5 15 Z M20 91.5 L25 86.5 L20 81.5 L15 86.5 Z M80 91.5 L85 86.5 L80 81.5 L75 86.5 Z" />
+    {/* Base Metal Color (Slate 800) */}
+    <defs>
+      <linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{stopColor: 'currentColor', stopOpacity: 0.8}} />
+        <stop offset="100%" style={{stopColor: 'currentColor', stopOpacity: 0.3}} />
+      </linearGradient>
+      
+      {/* Pattern for Bolt Holes */}
+      <pattern id="boltHoles" patternUnits="userSpaceOnUse" width="10" height="10">
+        <circle cx="5" cy="5" r="1.5" fill="#12181F" />
+      </pattern>
+    </defs>
+
+    {/* Gear Body - Simulating Depth */}
+    {/* Shadow layer (Slightly offset and darker) */}
+    <circle cx="50.5" cy="50.5" r="45" fill="none" stroke="#000" strokeOpacity="0.1" strokeWidth="1" />
+
+    {/* Outer Teeth (Updated shape for realism) */}
+    <path 
+      d="M50 5 L55 0 L50 5 L45 0 Z M50 95 L55 100 L50 95 L45 100 Z M5 50 L0 55 L5 50 L0 45 Z M95 50 L100 55 L95 50 L100 45 Z M22.5 7.5 L27.5 2.5 L22.5 7.5 L17.5 2.5 Z M77.5 7.5 L82.5 2.5 L77.5 7.5 L72.5 2.5 Z M7.5 22.5 L2.5 27.5 L7.5 22.5 L2.5 17.5 Z M92.5 22.5 L97.5 27.5 L92.5 22.5 L87.5 17.5 Z M7.5 77.5 L2.5 82.5 L7.5 77.5 L2.5 72.5 Z M92.5 77.5 L97.5 82.5 L92.5 77.5 L87.5 72.5 Z M22.5 92.5 L27.5 97.5 L22.5 92.5 L17.5 97.5 Z M77.5 92.5 L82.5 97.5 L77.5 92.5 L72.5 97.5 Z" 
+      fill="url(#metalGradient)" 
+      stroke="#333" 
+      strokeWidth="0.5"
+    />
+
+    {/* Main Circular Body */}
+    <circle cx="50" cy="50" r="40" fill="url(#metalGradient)" stroke="#333" strokeWidth="1" />
+
+    {/* Inner Spokes/Web */}
+    <circle cx="50" cy="50" r="30" fill="#12181F" stroke="#333" strokeWidth="1" />
+
+    {/* Spokes that connect the hub to the inner rim */}
+    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(0 50 50)" />
+    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(90 50 50)" />
+    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(180 50 50)" />
+    <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(270 50 50)" />
     
-    {/* Main Gear Body (Circle) */}
-    <circle cx="50" cy="50" r="45" strokeWidth="0" />
-
-    {/* Center Hole */}
-    <circle cx="50" cy="50" r="15" fill="#12181F" stroke="#333" strokeWidth="1" />
-
-    {/* Inner Spokes (to match the industrial look) */}
-    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(0 50 50)" stroke="#333" strokeWidth="1" />
-    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(60 50 50)" stroke="#333" strokeWidth="1" />
-    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(120 50 50)" stroke="#333" strokeWidth="1" />
-    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(180 50 50)" stroke="#333" strokeWidth="1" />
-    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(240 50 50)" stroke="#333" strokeWidth="1" />
-    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(300 50 50)" stroke="#333" strokeWidth="1" />
-
-    {/* Center Hub */}
-    <circle cx="50" cy="50" r="10" fill="currentColor" stroke="#333" strokeWidth="1" />
-
-    {/* Accent Circle for depth */}
-    <circle cx="50" cy="50" r="5" fill="#222" />
+    {/* Central Hub with gradient for realism */}
+    <circle cx="50" cy="50" r="10" fill="url(#metalGradient)" stroke="#333" strokeWidth="1" />
+    
+    {/* Bolt Holes on the Outer Body (pattern fill is complex to implement directly with rotation, so we use manual circles for visual effect) */}
+    <circle cx="50" cy="15" r="2" fill="#12181F" />
+    <circle cx="85" cy="50" r="2" fill="#12181F" />
+    <circle cx="50" cy="85" r="2" fill="#12181F" />
+    <circle cx="15" cy="50" r="2" fill="#12181F" />
+    
+    {/* Final Center Hole */}
+    <circle cx="50" cy="50" r="4" fill="#12181F" />
   </svg>
 );
 
@@ -93,16 +115,16 @@ const MovingGearsBackground = () => {
         animate={{ rotate: 360 }}
         transition={{ duration: 40, ease: "linear", repeat: Infinity }}
       >
-        <ComplexGearSVG size={700} />
+        <IndustrialGearSVG size={700} />
       </motion.div>
 
       {/* 2. Smaller Connecting Gear (Top Center) */}
       <motion.div
         className="absolute top-20 right-1/2 -translate-x-1/2 text-slate-600/20"
-        animate={{ rotate: -360 }} // Counter-clockwise for meshing
+        animate={{ rotate: -360 }} // Counter-clockwise for meshing look
         transition={{ duration: 25, ease: "linear", repeat: Infinity }}
       >
-        <ComplexGearSVG size={400} />
+        <IndustrialGearSVG size={400} />
       </motion.div>
 
       {/* 3. Large Bottom Left Gear */}
@@ -111,7 +133,7 @@ const MovingGearsBackground = () => {
         animate={{ rotate: 360 }}
         transition={{ duration: 50, ease: "linear", repeat: Infinity }}
       >
-        <ComplexGearSVG size={800} />
+        <IndustrialGearSVG size={800} />
       </motion.div>
 
       {/* 4. Medium Floating Gear (Center-ish Right) */}
@@ -120,7 +142,7 @@ const MovingGearsBackground = () => {
         animate={{ rotate: -360 }}
         transition={{ duration: 35, ease: "linear", repeat: Infinity }}
       >
-        <ComplexGearSVG size={300} />
+        <IndustrialGearSVG size={300} />
       </motion.div>
 
     </div>
