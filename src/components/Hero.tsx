@@ -5,7 +5,7 @@ import { ArrowRight, Linkedin, ChevronLeft, ChevronRight, RotateCw } from 'lucid
 // ----------------------------------------------------------------------
 // 1. IMPORTS & ASSETS
 // ----------------------------------------------------------------------
-// NOTE: I have updated this to .jpg based on your error logs. 
+// NOTE: Corrected the portrait import to Ngene.jpg (as uploaded).
 import JamesNgenePortrait from '../assets/Ngene.png'; 
 import GradImage1 from '../assets/ngene grad 1.jpg';
 import GradImage2 from '../assets/ngene grad 2.jpg';
@@ -14,11 +14,11 @@ import GradImage4 from '../assets/ngene grad 4.jpg';
 
 // Define the list of images
 const images = [
-  { src: JamesNgenePortrait, alt: "Professional Portrait" },
-  { src: GradImage1, alt: "Graduation 1" },
-  { src: GradImage2, alt: "Graduation 2" },
-  { src: GradImage3, alt: "Graduation 3" },
-  { src: GradImage4, alt: "Graduation 4" },
+  { src: JamesNgenePortrait, alt: "Professional Portrait" }, // Ngene.jpg
+  { src: GradImage1, alt: "Graduation 1" }, // ngene grad 1.jpg
+  { src: GradImage2, alt: "Graduation 2" }, // ngene grad 2.jpg
+  { src: GradImage3, alt: "Graduation 3" }, // ngene grad 3.jpg
+  { src: GradImage4, alt: "Graduation 4" }, // ngene grad 4.jpg
 ];
 
 // ----------------------------------------------------------------------
@@ -42,77 +42,87 @@ const itemVariants: Variants = {
 };
 
 // ----------------------------------------------------------------------
-// 3. MOVING GEARS BACKGROUND (New)
+// 3. COMPLEX INDUSTRIAL GEAR SVG COMPONENT (New, Realistic Look)
 // ----------------------------------------------------------------------
 
-const GearIcon = ({ className, size = 100 }: { className?: string, size?: number }) => (
+const ComplexGearSVG = ({ className, size = 100 }: { className?: string, size?: number }) => (
+  // ViewBox is set to 0 0 100 100 for easy scaling
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
+    viewBox="0 0 100 100" 
     width={size} 
     height={size} 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="1" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
     className={className}
+    fill="currentColor"
+    stroke="currentColor"
+    strokeWidth="0.5"
+    strokeLinejoin="round"
   >
-    <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" opacity="0" />
-    <path d="M12 22a10 10 0 0 1-10-10" opacity="0"/>
-    {/* Complex Gear Path */}
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-    <circle cx="12" cy="12" r="3" />
+    {/* Outer Gear Teeth (Large Ring) */}
+    <path d="M50 0 L55 5 L50 10 L45 5 Z M50 90 L55 95 L50 100 L45 95 Z M0 50 L5 55 L10 50 L5 45 Z M90 50 L95 55 L100 50 L95 45 Z M20 8.5 L25 13.5 L20 18.5 L15 13.5 Z M80 8.5 L85 13.5 L80 18.5 L75 13.5 Z M8.5 20 L13.5 25 L18.5 20 L13.5 15 Z M8.5 80 L13.5 85 L18.5 80 L13.5 75 Z M91.5 80 L86.5 85 L81.5 80 L86.5 75 Z M91.5 20 L86.5 25 L81.5 20 L86.5 15 Z M20 91.5 L25 86.5 L20 81.5 L15 86.5 Z M80 91.5 L85 86.5 L80 81.5 L75 86.5 Z" />
+    
+    {/* Main Gear Body (Circle) */}
+    <circle cx="50" cy="50" r="45" strokeWidth="0" />
+
+    {/* Center Hole */}
+    <circle cx="50" cy="50" r="15" fill="#12181F" stroke="#333" strokeWidth="1" />
+
+    {/* Inner Spokes (to match the industrial look) */}
+    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(0 50 50)" stroke="#333" strokeWidth="1" />
+    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(60 50 50)" stroke="#333" strokeWidth="1" />
+    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(120 50 50)" stroke="#333" strokeWidth="1" />
+    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(180 50 50)" stroke="#333" strokeWidth="1" />
+    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(240 50 50)" stroke="#333" strokeWidth="1" />
+    <rect x="47" y="15" width="6" height="35" rx="3" ry="3" fill="#12181F" transform="rotate(300 50 50)" stroke="#333" strokeWidth="1" />
+
+    {/* Center Hub */}
+    <circle cx="50" cy="50" r="10" fill="currentColor" stroke="#333" strokeWidth="1" />
+
+    {/* Accent Circle for depth */}
+    <circle cx="50" cy="50" r="5" fill="#222" />
   </svg>
 );
+
 
 const MovingGearsBackground = () => {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
       {/* 1. Large Top Right Gear */}
       <motion.div
-        className="absolute -top-20 -right-20 text-slate-700/20"
+        className="absolute -top-32 -right-32 text-slate-700/20"
         animate={{ rotate: 360 }}
         transition={{ duration: 40, ease: "linear", repeat: Infinity }}
       >
-        <GearIcon size={500} />
+        <ComplexGearSVG size={700} />
       </motion.div>
 
-      {/* 2. Smaller Connecting Gear (Top Right) */}
+      {/* 2. Smaller Connecting Gear (Top Center) */}
       <motion.div
-        className="absolute top-64 right-64 text-slate-600/20"
-        animate={{ rotate: -360 }} // Counter-clockwise
+        className="absolute top-20 right-1/2 -translate-x-1/2 text-slate-600/20"
+        animate={{ rotate: -360 }} // Counter-clockwise for meshing
         transition={{ duration: 25, ease: "linear", repeat: Infinity }}
       >
-        <GearIcon size={300} />
+        <ComplexGearSVG size={400} />
       </motion.div>
 
       {/* 3. Large Bottom Left Gear */}
       <motion.div
-        className="absolute -bottom-32 -left-32 text-slate-700/20"
+        className="absolute -bottom-48 -left-48 text-slate-700/15"
         animate={{ rotate: 360 }}
         transition={{ duration: 50, ease: "linear", repeat: Infinity }}
       >
-        <GearIcon size={600} />
+        <ComplexGearSVG size={800} />
       </motion.div>
 
-      {/* 4. Medium Floating Gear (Center-ish Left) */}
+      {/* 4. Medium Floating Gear (Center-ish Right) */}
       <motion.div
-        className="absolute top-1/4 left-10 text-slate-800/30"
+        className="absolute bottom-1/4 right-24 text-slate-800/30"
         animate={{ rotate: -360 }}
         transition={{ duration: 35, ease: "linear", repeat: Infinity }}
       >
-        <GearIcon size={200} />
+        <ComplexGearSVG size={300} />
       </motion.div>
 
-       {/* 5. Extra Small Gear (Background accent) */}
-       <motion.div
-        className="absolute bottom-1/4 right-1/3 text-slate-800/10"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 20, ease: "linear", repeat: Infinity }}
-      >
-        <GearIcon size={150} />
-      </motion.div>
     </div>
   );
 };
