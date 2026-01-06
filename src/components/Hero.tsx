@@ -42,7 +42,7 @@ const itemVariants: Variants = {
 };
 
 // ----------------------------------------------------------------------
-// 3. INDUSTRIAL GEAR SVG COMPONENT (Updated for Realistic Depth)
+// 3. INDUSTRIAL GEAR SVG COMPONENT (Updated with 3D Filters and Layering)
 // ----------------------------------------------------------------------
 
 const IndustrialGearSVG = ({ className, size = 100 }: { className?: string, size?: number }) => (
@@ -53,23 +53,35 @@ const IndustrialGearSVG = ({ className, size = 100 }: { className?: string, size
     width={size} 
     height={size} 
     className={className}
+    style={{ filter: 'url(#gear-depth)' }} // Apply the 3D filter to the entire gear
   >
-    {/* Base Metal Color (Slate 800) */}
     <defs>
+      {/* Metallic Gradient (used for the gear body) */}
       <linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style={{stopColor: 'currentColor', stopOpacity: 0.8}} />
-        <stop offset="100%" style={{stopColor: 'currentColor', stopOpacity: 0.3}} />
+        <stop offset="0%" style={{stopColor: 'currentColor', stopOpacity: 0.9}} />
+        <stop offset="50%" style={{stopColor: '#94a3b8', stopOpacity: 0.7}} />
+        <stop offset="100%" style={{stopColor: 'currentColor', stopOpacity: 0.6}} />
       </linearGradient>
-      
-      {/* Pattern for Bolt Holes */}
-      <pattern id="boltHoles" patternUnits="userSpaceOnUse" width="10" height="10">
-        <circle cx="5" cy="5" r="1.5" fill="#12181F" />
-      </pattern>
-    </defs>
 
-    {/* Gear Body - Simulating Depth */}
-    {/* Shadow layer (Slightly offset and darker) */}
-    <circle cx="50.5" cy="50.5" r="45" fill="none" stroke="#000" strokeOpacity="0.1" strokeWidth="1" />
+      {/* 3D Depth Filter: Simulates a metallic bevel and drop shadow */}
+      <filter id="gear-depth" x="-50%" y="-50%" width="200%" height="200%">
+        {/* Drop Shadow for the Gear itself */}
+        <feDropShadow dx="3" dy="3" stdDeviation="3" floodColor="#000" floodOpacity="0.5" />
+        {/* Inner Lighting (Bevel/Emboss) */}
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur" />
+        <feOffset in="blur" dx="1" dy="1" result="offsetBlur" />
+        <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.8" specularExponent="10" lightingColor="#FFF" result="specular">
+          <fePointLight x="-5000" y="-10000" z="20000" />
+        </feSpecularLighting>
+        <feComposite in="specular" in2="SourceGraphic" operator="in" result="specularComposite" />
+        <feComposite in="SourceGraphic" in2="specularComposite" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="combinedLighting" />
+        <feMerge>
+          <feMergeNode in="offsetBlur" /> 
+          <feMergeNode in="combinedLighting" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
 
     {/* Outer Teeth (Updated shape for realism) */}
     <path 
@@ -79,22 +91,22 @@ const IndustrialGearSVG = ({ className, size = 100 }: { className?: string, size
       strokeWidth="0.5"
     />
 
-    {/* Main Circular Body */}
+    {/* Main Circular Body (Inner Edge Layer 1) */}
     <circle cx="50" cy="50" r="40" fill="url(#metalGradient)" stroke="#333" strokeWidth="1" />
 
-    {/* Inner Spokes/Web */}
+    {/* Inner Web (Darker/Recessed Area) */}
     <circle cx="50" cy="50" r="30" fill="#12181F" stroke="#333" strokeWidth="1" />
 
-    {/* Spokes that connect the hub to the inner rim */}
+    {/* Spokes that connect the hub to the inner rim (Layered over the dark web) */}
     <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(0 50 50)" />
     <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(90 50 50)" />
     <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(180 50 50)" />
     <rect x="48.5" y="20" width="3" height="30" rx="1.5" fill="url(#metalGradient)" transform="rotate(270 50 50)" />
     
-    {/* Central Hub with gradient for realism */}
+    {/* Central Hub (Raised Layer) */}
     <circle cx="50" cy="50" r="10" fill="url(#metalGradient)" stroke="#333" strokeWidth="1" />
     
-    {/* Bolt Holes on the Outer Body (pattern fill is complex to implement directly with rotation, so we use manual circles for visual effect) */}
+    {/* Bolt Holes on the Outer Body (Recessed Layer) */}
     <circle cx="50" cy="15" r="2" fill="#12181F" />
     <circle cx="85" cy="50" r="2" fill="#12181F" />
     <circle cx="50" cy="85" r="2" fill="#12181F" />
