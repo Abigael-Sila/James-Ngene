@@ -42,7 +42,7 @@ const itemVariants: Variants = {
 };
 
 // ----------------------------------------------------------------------
-// 3. INDUSTRIAL GEAR SVG COMPONENT (Updated with 3D Filters and Layering)
+// 3. INDUSTRIAL GEAR SVG COMPONENT (With 3D Filters)
 // ----------------------------------------------------------------------
 
 const IndustrialGearSVG = ({ className, size = 100 }: { className?: string, size?: number }) => (
@@ -121,7 +121,8 @@ const IndustrialGearSVG = ({ className, size = 100 }: { className?: string, size
 const MovingGearsBackground = () => {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-      {/* 1. Large Top Right Gear */}
+      
+      {/* 1. Large Top Right Gear (Clockwise) */}
       <motion.div
         className="absolute -top-32 -right-32 text-slate-700/20"
         animate={{ rotate: 360 }}
@@ -130,16 +131,16 @@ const MovingGearsBackground = () => {
         <IndustrialGearSVG size={700} />
       </motion.div>
 
-      {/* 2. Smaller Connecting Gear (Top Center) */}
+      {/* 2. Smaller Connecting Gear (Top Center) - ROTATES OPPOSITE FOR MESHING */}
       <motion.div
         className="absolute top-20 right-1/2 -translate-x-1/2 text-slate-600/20"
-        animate={{ rotate: -360 }} // Counter-clockwise for meshing look
+        animate={{ rotate: -360 }} // NEGATIVE ROTATION for meshing effect with Gear 1
         transition={{ duration: 25, ease: "linear", repeat: Infinity }}
       >
         <IndustrialGearSVG size={400} />
       </motion.div>
 
-      {/* 3. Large Bottom Left Gear */}
+      {/* 3. Large Bottom Left Gear (Clockwise) */}
       <motion.div
         className="absolute -bottom-48 -left-48 text-slate-700/15"
         animate={{ rotate: 360 }}
@@ -148,7 +149,7 @@ const MovingGearsBackground = () => {
         <IndustrialGearSVG size={800} />
       </motion.div>
 
-      {/* 4. Medium Floating Gear (Center-ish Right) */}
+      {/* 4. Medium Floating Gear (Center-ish Right) - Counter-Clockwise */}
       <motion.div
         className="absolute bottom-1/4 right-24 text-slate-800/30"
         animate={{ rotate: -360 }}
