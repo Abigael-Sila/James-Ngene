@@ -6,7 +6,7 @@ import { ArrowRight, Linkedin, ChevronLeft, ChevronRight, RotateCw } from 'lucid
 // 1. IMPORTS & ASSETS
 // ----------------------------------------------------------------------
 // Ensure these paths match exactly where you saved the files in your src/assets folder
-import JamesNgenePortrait from '../assets/Ngene.jpg'; 
+import JamesNgenePortrait from '../assets/Ngene.png'; 
 import GradImage1 from '../assets/ngene grad 1.jpg';
 import GradImage2 from '../assets/ngene grad 2.jpg';
 import GradImage3 from '../assets/ngene grad 3.jpg';
