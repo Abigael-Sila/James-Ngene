@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { ArrowRight, Linkedin, ChevronLeft, ChevronRight, RotateCw } from 'lucide-react';
 
 // ----------------------------------------------------------------------
 // 1. IMPORTS & ASSETS
 // ----------------------------------------------------------------------
-// Ensure these paths match exactly where you saved the files in your src/assets folder
+// NOTE: I have updated this to .jpg based on your error logs. 
 import JamesNgenePortrait from '../assets/Ngene.png'; 
 import GradImage1 from '../assets/ngene grad 1.jpg';
 import GradImage2 from '../assets/ngene grad 2.jpg';
@@ -22,16 +22,7 @@ const images = [
 ];
 
 // ----------------------------------------------------------------------
-// 2. TYPES & GLOBALS
-// ----------------------------------------------------------------------
-declare global {
-  interface Window {
-    THREE: any;
-  }
-}
-
-// ----------------------------------------------------------------------
-// 3. ANIMATION VARIANTS
+// 2. ANIMATION VARIANTS
 // ----------------------------------------------------------------------
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -51,113 +42,90 @@ const itemVariants: Variants = {
 };
 
 // ----------------------------------------------------------------------
-// 4. THREE.JS BACKGROUND COMPONENT
+// 3. MOVING GEARS BACKGROUND (New)
 // ----------------------------------------------------------------------
-const ThreeJSBackground = () => {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
 
-  useEffect(() => {
-    const setupAnimation = () => {
-      if (!mountRef.current) return;
+const GearIcon = ({ className, size = 100 }: { className?: string, size?: number }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    width={size} 
+    height={size} 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="1" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" opacity="0" />
+    <path d="M12 22a10 10 0 0 1-10-10" opacity="0"/>
+    {/* Complex Gear Path */}
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
 
-      const scene = new window.THREE.Scene();
-      const camera = new window.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      const renderer = new window.THREE.WebGLRenderer({ alpha: true, antialias: true });
+const MovingGearsBackground = () => {
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+      {/* 1. Large Top Right Gear */}
+      <motion.div
+        className="absolute -top-20 -right-20 text-slate-700/20"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+      >
+        <GearIcon size={500} />
+      </motion.div>
 
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      mountRef.current.appendChild(renderer.domElement);
-      
-      camera.position.z = 10;
-      
-      const ambientLight = new window.THREE.AmbientLight(0xffffff, 0.5);
-      scene.add(ambientLight);
-      
-      const directionalLight = new window.THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(5, 5, 5);
-      scene.add(directionalLight);
+      {/* 2. Smaller Connecting Gear (Top Right) */}
+      <motion.div
+        className="absolute top-64 right-64 text-slate-600/20"
+        animate={{ rotate: -360 }} // Counter-clockwise
+        transition={{ duration: 25, ease: "linear", repeat: Infinity }}
+      >
+        <GearIcon size={300} />
+      </motion.div>
 
-      const objects = new window.THREE.Group();
-      scene.add(objects);
+      {/* 3. Large Bottom Left Gear */}
+      <motion.div
+        className="absolute -bottom-32 -left-32 text-slate-700/20"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 50, ease: "linear", repeat: Infinity }}
+      >
+        <GearIcon size={600} />
+      </motion.div>
 
-      const boltGeometry = new window.THREE.CylinderGeometry(0.5, 0.5, 2, 6);
-      const nutGeometry = new window.THREE.CylinderGeometry(0.8, 0.8, 0.5, 6);
-      const gearGeometry = new window.THREE.CylinderGeometry(1.5, 1.5, 0.3, 10, 1, false);
-      
-      const material = new window.THREE.MeshStandardMaterial({
-        color: 0xeeeeee, 
-        metalness: 0.9,
-        roughness: 0.3,
-      });
+      {/* 4. Medium Floating Gear (Center-ish Left) */}
+      <motion.div
+        className="absolute top-1/4 left-10 text-slate-800/30"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 35, ease: "linear", repeat: Infinity }}
+      >
+        <GearIcon size={200} />
+      </motion.div>
 
-      const createObject = () => {
-        const geometries = [boltGeometry, nutGeometry, gearGeometry];
-        const geometry = geometries[Math.floor(Math.random() * geometries.length)];
-        const object = new window.THREE.Mesh(geometry, material);
-        
-        object.position.x = (Math.random() - 0.5) * 50;
-        object.position.y = (Math.random() - 0.5) * 50;
-        object.position.z = (Math.random() - 0.5) * 50;
-        
-        object.rotation.x = Math.random() * Math.PI;
-        object.rotation.y = Math.random() * Math.PI;
-        
-        objects.add(object);
-      };
-
-      for (let i = 0; i < 100; i++) {
-        createObject();
-      }
-
-      const animate = () => {
-        animationRef.current = requestAnimationFrame(animate);
-        objects.children.forEach((object: any) => {
-          object.rotation.x += 0.01;
-          object.rotation.y += 0.01;
-        });
-        objects.position.x += 0.02;
-        objects.position.y += 0.02;
-        renderer.render(scene, camera);
-      };
-
-      const handleResize = () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      };
-
-      window.addEventListener('resize', handleResize);
-      animate();
-
-      return () => {
-        if (mountRef.current) mountRef.current.removeChild(renderer.domElement);
-        window.removeEventListener('resize', handleResize);
-        if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      };
-    };
-
-    if (typeof window.THREE === 'undefined') {
-      const script = document.createElement('script');
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-      script.onload = setupAnimation;
-      document.head.appendChild(script);
-    } else {
-      setupAnimation();
-    }
-  }, []);
-
-  return <div ref={mountRef} className="absolute inset-0 z-0 opacity-20" />;
+       {/* 5. Extra Small Gear (Background accent) */}
+       <motion.div
+        className="absolute bottom-1/4 right-1/3 text-slate-800/10"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+      >
+        <GearIcon size={150} />
+      </motion.div>
+    </div>
+  );
 };
 
 // ----------------------------------------------------------------------
-// 5. CIRCULAR ORBIT CAROUSEL COMPONENT (New)
+// 4. CIRCULAR ORBIT CAROUSEL COMPONENT
 // ----------------------------------------------------------------------
 const CircularCarousel = () => {
   const [rotation, setRotation] = useState(0);
   
   // Carousel Configuration
   const totalImages = images.length;
-  const radius = 160; // Radius of the circle in pixels
+  const radius = 160; 
   const angleStep = 360 / totalImages;
 
   const rotateNext = () => setRotation((prev) => prev - angleStep);
@@ -174,34 +142,24 @@ const CircularCarousel = () => {
   return (
     <div className="relative flex h-[450px] w-full items-center justify-center overflow-visible">
       
-      {/* 1. The Orbit Ring (Decorative Dashed Line) */}
+      {/* Orbit Ring */}
       <motion.div 
         className="absolute rounded-full border-2 border-dashed border-emerald-500/30"
-        style={{ 
-          width: radius * 2, 
-          height: radius * 2,
-        }}
+        style={{ width: radius * 2, height: radius * 2 }}
         animate={{ rotate: rotation }} 
         transition={{ duration: 20, ease: "linear", repeat: Infinity }}
       />
       
-      {/* 2. Center Decorative Element */}
+      {/* Center Element */}
       <div className="absolute z-0 flex h-24 w-24 items-center justify-center rounded-full bg-slate-800/80 backdrop-blur-sm border border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
          <RotateCw className="text-emerald-500/50" size={32} />
       </div>
 
-      {/* 3. The Images Orbiting */}
+      {/* Images Orbiting */}
       <div className="absolute h-full w-full flex items-center justify-center">
         {images.map((img, index) => {
-          // Calculate the angle for this specific image
-          // index * step gives base position. + rotation adds the spin.
           const currentAngle = index * angleStep + rotation;
-          
-          // Convert Degrees to Radians for Math.cos/sin
           const rad = (currentAngle * Math.PI) / 180;
-          
-          // Calculate X and Y coordinates relative to center
-          // We swap cos/sin or +/- to adjust starting position (0 deg is usually 3 o'clock)
           const x = radius * Math.cos(rad);
           const y = radius * Math.sin(rad);
 
@@ -212,11 +170,9 @@ const CircularCarousel = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                // Center the item on its calculated point
                 x: x, 
                 y: y,
               }}
-              // Animate the position change smoothly
               animate={{ x, y }}
               transition={{ type: 'spring', stiffness: 50, damping: 15 }}
             >
@@ -225,42 +181,34 @@ const CircularCarousel = () => {
                 alt={img.alt} 
                 className="h-full w-full object-cover"
               />
-              {/* Optional: Glossy overlay */}
               <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
             </motion.div>
           );
         })}
       </div>
 
-      {/* 4. Controls */}
+      {/* Controls */}
       <div className="absolute bottom-0 flex gap-4">
-         <button 
-           onClick={rotatePrev} 
-           className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700"
-         >
+         <button onClick={rotatePrev} className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700">
            <ChevronLeft size={20} />
          </button>
-         <button 
-           onClick={rotateNext} 
-           className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700"
-         >
+         <button onClick={rotateNext} className="rounded-full bg-slate-800/80 p-3 text-white hover:bg-emerald-500 hover:text-black transition-all border border-slate-700">
            <ChevronRight size={20} />
          </button>
       </div>
-
     </div>
   );
 };
 
-
 // ----------------------------------------------------------------------
-// 6. HERO COMPONENT
+// 5. HERO COMPONENT
 // ----------------------------------------------------------------------
 const Hero: React.FC = () => {
   return (
     <section id="home" className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#12181F] font-inter text-white">
-      {/* Three.js animated background */}
-      <ThreeJSBackground />
+      
+      {/* NEW BACKGROUND: Moving Gears */}
+      <MovingGearsBackground />
 
       {/* Main content container */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
